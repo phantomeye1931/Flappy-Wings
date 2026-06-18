@@ -1,12 +1,13 @@
 package dev.armand.monarch_wings.network;
 
-import dev.armand.monarch_wings.MonarchWings;
 import dev.armand.monarch_wings.DoubleJumper;
+import dev.armand.monarch_wings.MonarchWings;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,8 +27,16 @@ public record ServerboundDoubleJumpPayload() implements CustomPacketPayload {
     public static void handle(final ServerboundDoubleJumpPayload payload, final IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer serverPlayer) {
-                // Access the unique field in your mixin accessor style to sync the tick
-                ((DoubleJumper) serverPlayer).monarchWings$setLastDoubleJumpTick(serverPlayer.tickCount);
+                DoubleJumper jumper = (DoubleJumper) serverPlayer;
+
+                jumper.monarchWings$setLastDoubleJumpTick(serverPlayer.tickCount);
+                jumper.monarchWings$setHasDoubleJumped(true);
+
+                // Tell all surrounding players to run the animation locally
+                PacketDistributor.sendToPlayersTrackingEntity(
+                        serverPlayer,
+                        new ClientboundDoubleJumpPayload(serverPlayer.getId())
+                );
             }
         });
     }

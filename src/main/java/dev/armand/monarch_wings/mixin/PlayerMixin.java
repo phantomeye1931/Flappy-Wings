@@ -1,9 +1,10 @@
 package dev.armand.monarch_wings.mixin;
 
-import dev.armand.monarch_wings.MonarchWingsClient;
+import dev.armand.monarch_wings.Config;
+import dev.armand.monarch_wings.DoubleJump;
 import dev.armand.monarch_wings.DoubleJumper;
 import dev.armand.monarch_wings.network.ServerboundDoubleJumpPayload;
-import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -60,16 +61,13 @@ public class PlayerMixin implements DoubleJumper {
         Player player = (Player) (Object) this;
 
         // Reset the token if they hit the ground/liquids
-        if (player.onGround() || player.isInWater() || player.isInLava() || player.onClimbable()) {
+        if (player.onGround() || player.isInWater() || player.isInLava() || player.onClimbable() || player.isSpectator()) {
             this.monarchWings$hasDoubleJumped = false;
         }
 
         int progress = player.tickCount - this.monarchWings$lastDoubleJumpTick;
-        if (this.monarchWings$hasDoubleJumped && progress < MonarchWingsClient.LAUNCH_DELAY_TICKS) {
-            if (player.level().isClientSide()) {
-                // Execute client-side velocity change for snappy local feedback
-                MonarchWingsClient.launchPlayer(player, this.monarchWings$movementBeforeLaunching, progress);
-            }
+        if (this.monarchWings$hasDoubleJumped && progress < DoubleJump.LAUNCH_DELAY_TICKS) {
+            DoubleJump.launchPlayer(player, this.monarchWings$movementBeforeLaunching, progress);
         }
     }
 
@@ -78,32 +76,10 @@ public class PlayerMixin implements DoubleJumper {
     private float decreaseDoubleJumpFallDamage(float fallDistance) {
         Player player = (Player) (Object) this;
 
-        System.out.println("decreaseDoubleJumpFallDamage@" + player.getClass().getName() + ":");
-        System.out.println(player.tickCount - this.monarchWings$lastDoubleJumpTick);
-
-        if (player.tickCount - this.monarchWings$lastDoubleJumpTick <= MonarchWingsClient.FALLDAMAGE_TICKS) {
-            System.out.println("cancelling fall damage!");
-
-            int particleCount = 4 + player.getRandom().nextInt(5);
-
-            for (int i = 0; i < particleCount; i++) {
-                double angle = (i * Math.PI * 2) / particleCount;
-
-                // Form a small circle around the player's feet
-                double dx = Math.cos(angle) * 0.3 + player.getRandom().nextDouble() * 0.2 - 0.1;
-                double dz = Math.sin(angle) * 0.3 + player.getRandom().nextDouble() * 0.2 - 0.1;
-
-                player.level().addParticle(
-                        ParticleTypes.CLOUD,
-                        player.getX() + dx, player.getY() + 0.1, player.getZ() + dz, // Position
-                        dx * 0.2, 0.5, dz * 0.2    // Velocity (Shoots outward and down)
-                );
-            }
-
+        if (player.tickCount - this.monarchWings$lastDoubleJumpTick <= DoubleJump.FALLDAMAGE_TICKS) {
+            DoubleJump.landingParticles(player); // Epic landing particles
             return 0f;
         }
-
-        System.out.println("\n");
         return fallDistance;
     }
 
@@ -115,6 +91,11 @@ public class PlayerMixin implements DoubleJumper {
     @Override
     public boolean monarchWings$hasDoubleJumped() {
         return this.monarchWings$hasDoubleJumped;
+    }
+
+    @Override
+    public void monarchWings$setHasDoubleJumped(boolean hasDoubleJumped) {
+        this.monarchWings$hasDoubleJumped = hasDoubleJumped;
     }
 
     @Override

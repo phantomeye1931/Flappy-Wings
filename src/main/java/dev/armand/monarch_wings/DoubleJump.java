@@ -1,12 +1,13 @@
 package dev.armand.monarch_wings;
 
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-public class MonarchWingsClient {
+public class DoubleJump {
 
     public static final int FALLDAMAGE_TICKS = 30;
     public static final int LAUNCH_DELAY_TICKS = 7;
@@ -14,9 +15,6 @@ public class MonarchWingsClient {
     public static final double HORIZONTAL_BOOST = 1.4;
 
     public static void launchPlayer(Player player, Vec3 originalMovement, int ticks) {
-
-        System.out.println("launchPlayer@" + player.getClass().getName());
-        System.out.println("\n");
 
         player.resetFallDistance();
 
@@ -44,6 +42,27 @@ public class MonarchWingsClient {
                         ParticleTypes.CLOUD,
                         player.getX() + dx, player.getY() + dy, player.getZ() + dz,
                         dx * 0.5, -0.4 - player.getRandom().nextDouble() * 0.3, dz * 0.5
+                );
+            }
+        }
+    }
+
+    public static void landingParticles(Player player) {
+        if (player.level() instanceof ServerLevel serverLevel) {
+
+            int particleCount = 4 + player.getRandom().nextInt(5);
+
+            for (int i = 0; i < particleCount; i++) {
+                double angle = (i * Math.PI * 2) / particleCount;
+
+                // Form a small circle around the player's feet
+                double dx = Math.cos(angle) * 0.3 + player.getRandom().nextDouble() * 0.2 - 0.1;
+                double dz = Math.sin(angle) * 0.3 + player.getRandom().nextDouble() * 0.2 - 0.1;
+
+                serverLevel.sendParticles(
+                        ParticleTypes.CLOUD,
+                        player.getX() + dx, player.getY() + 0.1, player.getZ() + dz, // Position
+                        0, dx * 0.2, 0.5, dz * 0.2, 1.0
                 );
             }
         }

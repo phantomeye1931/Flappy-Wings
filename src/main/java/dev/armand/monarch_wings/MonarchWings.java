@@ -1,6 +1,7 @@
 package dev.armand.monarch_wings;
 
 import com.mojang.logging.LogUtils;
+import dev.armand.monarch_wings.network.ClientboundDoubleJumpPayload;
 import dev.armand.monarch_wings.network.ServerboundDoubleJumpPayload;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -27,6 +28,11 @@ public class MonarchWings {
                 ServerboundDoubleJumpPayload.TYPE,
                 ServerboundDoubleJumpPayload.CODEC,
                 ServerboundDoubleJumpPayload::handle
+        );
+        registrar.playToClient(
+                ClientboundDoubleJumpPayload.TYPE,
+                ClientboundDoubleJumpPayload.CODEC,
+                ClientboundDoubleJumpPayload::handle
         );
     }
 }
