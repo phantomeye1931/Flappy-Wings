@@ -1,5 +1,4 @@
 {
-  "itemGroup.monarch_wings": "Example Mod Tab",
-  "block.monarch_wings.example_block": "Example Block",
-  "item.monarch_wings.example_item": "Example Item"
+  "flappy_wings.configuration.cooldown_seconds": "Cooldown seconds",
+  "flappy_wings.configuration.flying_dimensions": "Flying dimensions"
 }
