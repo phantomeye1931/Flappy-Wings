@@ -10,9 +10,10 @@ import net.minecraft.world.phys.Vec3;
 public class DoubleJump {
 
     public static final int FALLDAMAGE_TICKS = 30;
-    public static final int LAUNCH_DELAY_TICKS = 7;
     public static final double VERTICAL_BOOST = 0.95;
-    public static final double HORIZONTAL_BOOST = 1.4;
+    public static final double HORIZONTAL_BOOST = 1.3;
+
+    public static final int LAUNCH_DELAY_TICKS = 7;
 
     public static void launchPlayer(Player player, Vec3 originalMovement, int ticks) {
 

@@ -31,9 +31,19 @@ public class PlayerMixin implements DoubleJumper {
     @Unique
     private Vec3 monarchWings$movementBeforeLaunching = new Vec3(0, 0, 0);
 
+    @Unique
+    private boolean monarchWings$mayFlyHere(Player player) {
+        ResourceLocation dimension = player.level().dimension().location();
+        return Config.flyingDimensions.contains(dimension.toString())
+                || Config.flyingDimensions.contains(dimension.getPath());
+    }
+
     @Inject(method = "tryToStartFallFlying", at = @At("HEAD"), cancellable = true)
     private void preventElytraFlight(CallbackInfoReturnable<Boolean> cir) {
         Player player = (Player) (Object) this;
+
+        // If we're in a dimension where flying is enabled, SKIP
+        if (monarchWings$mayFlyHere(player)) return;
 
 //        if (true) { // TODO: Cooldown config?
         if (!player.onGround() && !player.isFallFlying() && !player.isInWater() && !player.isInLava()
@@ -60,14 +70,22 @@ public class PlayerMixin implements DoubleJumper {
     private void handleDelayedJumpLaunch(CallbackInfo ci) {
         Player player = (Player) (Object) this;
 
+        if (!this.monarchWings$hasDoubleJumped) return;
+
         // Reset the token if they hit the ground/liquids
         if (player.onGround() || player.isInWater() || player.isInLava() || player.onClimbable() || player.isSpectator()) {
             this.monarchWings$hasDoubleJumped = false;
         }
 
-        int progress = player.tickCount - this.monarchWings$lastDoubleJumpTick;
-        if (this.monarchWings$hasDoubleJumped && progress < DoubleJump.LAUNCH_DELAY_TICKS) {
-            DoubleJump.launchPlayer(player, this.monarchWings$movementBeforeLaunching, progress);
+        int ticksSinceJump = player.tickCount - this.monarchWings$lastDoubleJumpTick;
+
+        // Reset the double jump after the config-specified cooldown
+        if (ticksSinceJump > Config.cooldownTicks) {
+            this.monarchWings$hasDoubleJumped = false;
+        }
+
+        if (this.monarchWings$hasDoubleJumped && ticksSinceJump < DoubleJump.LAUNCH_DELAY_TICKS) {
+            DoubleJump.launchPlayer(player, this.monarchWings$movementBeforeLaunching, ticksSinceJump);
         }
     }
 
@@ -75,6 +93,8 @@ public class PlayerMixin implements DoubleJumper {
     @ModifyVariable(method = "causeFallDamage", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private float decreaseDoubleJumpFallDamage(float fallDistance) {
         Player player = (Player) (Object) this;
+
+        if (!this.monarchWings$hasDoubleJumped) return fallDistance;
 
         if (player.tickCount - this.monarchWings$lastDoubleJumpTick <= DoubleJump.FALLDAMAGE_TICKS) {
             DoubleJump.landingParticles(player); // Epic landing particles
