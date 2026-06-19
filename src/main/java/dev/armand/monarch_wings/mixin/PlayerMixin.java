@@ -7,6 +7,7 @@ import dev.armand.monarch_wings.network.ServerboundDoubleJumpPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -26,10 +27,19 @@ public class PlayerMixin implements DoubleJumper {
     private boolean monarchWings$hasDoubleJumped = false;
 
     @Unique
+    private boolean monarchWings$doubleJumpReady = true;
+
+    @Unique
     private int monarchWings$lastDoubleJumpTick = 0;
 
     @Unique
     private Vec3 monarchWings$movementBeforeLaunching = new Vec3(0, 0, 0);
+
+    @Unique
+    private double monarchWings$minHeightAfterLaunching = 0;
+
+    @Unique
+    private double monarchWings$topHeightAfterLaunching = 0;
 
     @Unique
     private boolean monarchWings$mayFlyHere(Player player) {
@@ -45,16 +55,13 @@ public class PlayerMixin implements DoubleJumper {
         // If we're in a dimension where flying is enabled, SKIP
         if (monarchWings$mayFlyHere(player)) return;
 
-//        if (true) { // TODO: Cooldown config?
         if (!player.onGround() && !player.isFallFlying() && !player.isInWater() && !player.isInLava()
-                && !player.hasEffect(MobEffects.LEVITATION) && !player.onClimbable() && !this.monarchWings$hasDoubleJumped) {
+                && !player.hasEffect(MobEffects.LEVITATION) && !player.onClimbable() && this.monarchWings$doubleJumpReady) {
 
             ItemStack itemstack = player.getItemBySlot(EquipmentSlot.CHEST);
 
             if (itemstack.canElytraFly(player)) {
-                this.monarchWings$hasDoubleJumped = true;
-                this.monarchWings$lastDoubleJumpTick = player.tickCount;
-                this.monarchWings$movementBeforeLaunching = player.getDeltaMovement();
+                monarchWings$startDoubleJumping(player);
 
                 if (player.level().isClientSide()) {
                     // Send a packet immediately so server and client animation tick targets align
@@ -72,21 +79,26 @@ public class PlayerMixin implements DoubleJumper {
 
         if (!this.monarchWings$hasDoubleJumped) return;
 
-        // Reset the token if they hit the ground/liquids
-        if (player.onGround() || player.isInWater() || player.isInLava() || player.onClimbable() || player.isSpectator()) {
+        if (player.isInWater() || player.isInLava() || player.onClimbable() || player.isSpectator()) {
             this.monarchWings$hasDoubleJumped = false;
+            this.monarchWings$doubleJumpReady = true;
         }
 
         int ticksSinceJump = player.tickCount - this.monarchWings$lastDoubleJumpTick;
 
         // Reset the double jump after the config-specified cooldown
         if (ticksSinceJump > Config.cooldownTicks) {
-            this.monarchWings$hasDoubleJumped = false;
+            this.monarchWings$doubleJumpReady = true;
         }
 
+        this.monarchWings$topHeightAfterLaunching = Math.max(this.monarchWings$topHeightAfterLaunching, player.position().y());
+
         if (this.monarchWings$hasDoubleJumped && ticksSinceJump < DoubleJump.LAUNCH_DELAY_TICKS) {
+            this.monarchWings$minHeightAfterLaunching = Math.min(this.monarchWings$minHeightAfterLaunching, player.position().y());
+
             DoubleJump.launchPlayer(player, this.monarchWings$movementBeforeLaunching, ticksSinceJump);
         }
+
     }
 
     // Intercept fall distance math right before damage calculation
@@ -95,12 +107,32 @@ public class PlayerMixin implements DoubleJumper {
         Player player = (Player) (Object) this;
 
         if (!this.monarchWings$hasDoubleJumped) return fallDistance;
+        this.monarchWings$hasDoubleJumped = false; // Reset because we hit the ground
+        this.monarchWings$doubleJumpReady = true;
 
-        if (player.tickCount - this.monarchWings$lastDoubleJumpTick <= DoubleJump.FALLDAMAGE_TICKS) {
+        double safeFallHeight = this.monarchWings$minHeightAfterLaunching - player.getAttributeValue(Attributes.SAFE_FALL_DISTANCE);
+        boolean landingAboveJump = player.getY() > safeFallHeight;
+
+        if (landingAboveJump && fallDistance > player.getAttributeValue(Attributes.SAFE_FALL_DISTANCE)) {
             DoubleJump.landingParticles(player); // Epic landing particles
+
             return 0f;
         }
-        return fallDistance;
+
+        double jumpHeight = this.monarchWings$topHeightAfterLaunching - this.monarchWings$minHeightAfterLaunching;
+
+        return Math.max(0f, (float) (fallDistance - jumpHeight));
+    }
+
+    @Override
+    public void monarchWings$startDoubleJumping(Player player) {
+        this.monarchWings$hasDoubleJumped = true;
+        this.monarchWings$doubleJumpReady = false;
+        this.monarchWings$lastDoubleJumpTick = player.tickCount;
+        this.monarchWings$movementBeforeLaunching = player.getDeltaMovement();
+
+        this.monarchWings$topHeightAfterLaunching = player.position().y();
+        this.monarchWings$minHeightAfterLaunching = player.position().y();
     }
 
     @Override

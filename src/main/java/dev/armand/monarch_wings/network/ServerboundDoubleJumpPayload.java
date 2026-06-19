@@ -29,8 +29,10 @@ public record ServerboundDoubleJumpPayload() implements CustomPacketPayload {
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 DoubleJumper jumper = (DoubleJumper) serverPlayer;
 
-                jumper.monarchWings$setLastDoubleJumpTick(serverPlayer.tickCount);
-                jumper.monarchWings$setHasDoubleJumped(true);
+//                jumper.monarchWings$setLastDoubleJumpTick(serverPlayer.tickCount);
+//                jumper.monarchWings$setHasDoubleJumped(true);
+
+                jumper.monarchWings$startDoubleJumping(serverPlayer);
 
                 // Tell all surrounding players to run the animation locally
                 PacketDistributor.sendToPlayersTrackingEntity(
