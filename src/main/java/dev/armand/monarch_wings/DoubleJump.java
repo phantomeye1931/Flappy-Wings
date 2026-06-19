@@ -3,7 +3,6 @@ package dev.armand.monarch_wings;
 import dev.armand.monarch_wings.util.SmoothGradient;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -54,7 +53,7 @@ public class DoubleJump {
                 Mth.lerp(amount, movement.z, horizontal.apply(movement.z))
         );
 
-        if (ticks == 0) player.playSound(SoundEvents.ENDER_DRAGON_FLAP);
+        if (ticks == 0) player.playSound(MonarchWingsSounds.ELYTRA_FLAP.get());
 
         if (ticks > 2) {
 

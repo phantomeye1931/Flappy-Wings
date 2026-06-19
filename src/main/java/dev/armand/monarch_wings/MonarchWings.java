@@ -20,6 +20,8 @@ public class MonarchWings {
 
     public MonarchWings(IEventBus modEventBus, ModContainer modContainer) {
         LOGGER.info("Monarch Wings initialized. Vanilla elytra flight disabled.");
+
+        MonarchWingsSounds.register(modEventBus);
         modEventBus.addListener(this::registerPackets);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
