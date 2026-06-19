@@ -8,8 +8,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 public class DoubleJump {
-
-    public static final int FALLDAMAGE_TICKS = 30;
     public static final double VERTICAL_BOOST = 0.95;
     public static final double HORIZONTAL_BOOST = 1.3;
 
