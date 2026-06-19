@@ -1,0 +1,9 @@
+{
+  "item.elytra.flap": {
+    "category": "players",
+    "sounds": [
+      "monarch_wings:flap"
+    ],
+    "subtitle": "item.elytra.flap"
+  }
+}
