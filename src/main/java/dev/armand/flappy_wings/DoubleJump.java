@@ -21,7 +21,7 @@ public class DoubleJump {
         horizontalRatioGradient = new SmoothGradient();
 
         verticalRatioGradient.addStop(0.3, 0.6);
-        verticalRatioGradient.addStop(0, 1);
+        verticalRatioGradient.addStop(0.1, 1);
         verticalRatioGradient.addStop(-0.7, 1);
         verticalRatioGradient.addStop(-1.6, 0.6);
 
@@ -53,7 +53,11 @@ public class DoubleJump {
                 Mth.lerp(amount, movement.z, horizontal.apply(movement.z))
         );
 
-        if (ticks == 0) player.playSound(FlappyWingsSounds.ELYTRA_FLAP.get());
+        if (ticks == 0) player.playSound(
+                FlappyWingsSounds.ELYTRA_FLAP.get(),
+                1,
+                0.7f + player.getRandom().nextFloat() * 0.3f
+        );
 
         if (ticks > 2) {
 
