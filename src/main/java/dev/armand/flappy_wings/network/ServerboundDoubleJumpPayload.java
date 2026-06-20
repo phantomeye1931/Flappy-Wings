@@ -2,6 +2,7 @@ package dev.armand.flappy_wings.network;
 
 import dev.armand.flappy_wings.DoubleJumper;
 import dev.armand.flappy_wings.FlappyWings;
+import dev.armand.flappy_wings.util.FlightResetAccessor;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -33,6 +34,9 @@ public record ServerboundDoubleJumpPayload() implements CustomPacketPayload {
 //                jumper.flappyWings$setHasDoubleJumped(true);
 
                 jumper.flappyWings$startDoubleJumping(serverPlayer);
+
+                serverPlayer.connection.resetPosition();
+                ((FlightResetAccessor) serverPlayer.connection).flappyWings$resetFlightAntiCheat();
 
                 // Tell all surrounding players to run the animation locally
                 PacketDistributor.sendToPlayersTrackingEntity(

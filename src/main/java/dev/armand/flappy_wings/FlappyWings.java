@@ -41,6 +41,4 @@ public class FlappyWings {
     }
 }
 
-// TODO: Make config server-side only
 // TODO: Fix "flying is not enabled on this server"
-// TODO: Implement multiple double jumps config
