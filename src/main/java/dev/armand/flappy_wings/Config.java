@@ -25,6 +25,10 @@ public class Config {
             .comment("How much horizontal boost to apply during a double jump")
             .defineInRange("horizontal_multiplier", 1.3, 0, 2d);
 
+    private static final ModConfigSpec.BooleanValue ENABLE_DYNAMIC_BOOSTS = BUILDER
+            .comment("Enable smooth dynamic boosts depending on player momentum before the boost")
+            .define("enable_dynamic_boosts", true);
+
     // a list of strings that are treated as resource locations for items
     private static final ModConfigSpec.ConfigValue<List<? extends String>> FLYING_DIMENSIONS = BUILDER
             .comment("List of dimensions to disable Double Jump behaviour in, to have default flying")
@@ -40,6 +44,7 @@ public class Config {
     public static int cooldownTicks;
     public static double verticalBoost;
     public static double horizontalMultiplier;
+    public static boolean enableDynamicBoosts;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
@@ -52,6 +57,7 @@ public class Config {
 
         verticalBoost = VERTICAL_BOOST.get();
         horizontalMultiplier = HORIZONTAL_MULTIPLIER.get();
+        enableDynamicBoosts = ENABLE_DYNAMIC_BOOSTS.get();
         flyingDimensions = new HashSet<>(FLYING_DIMENSIONS.get());
     }
 }
