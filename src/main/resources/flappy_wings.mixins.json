@@ -4,13 +4,11 @@
   "package": "dev.armand.flappy_wings.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "PlayerMixin"
+    "PlayerMixin",
+    "ServerGamePacketListenerImplMixin"
   ],
   "client": [
     "ElytraModelMixin"
-  ],
-  "server": [
-    "ServerGamePacketListenerImplMixin"
   ],
   "injectors": {
     "defaultRequire": 1
