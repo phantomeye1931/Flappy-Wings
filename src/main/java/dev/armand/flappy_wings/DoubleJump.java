@@ -55,7 +55,7 @@ public class DoubleJump {
             double dx = -Math.sin(Math.toRadians(yaw));
             double dz = Math.cos(Math.toRadians(yaw));
 
-            double boost = (isX ? dx : dz) * Config.horizontalMultiplier * verticalToHorizontalBoost.getValue(verticalSpeed);
+            double boost = (isX ? dx : dz) * Config.horizontalBoost * verticalToHorizontalBoost.getValue(verticalSpeed);
 
             return speedHorizontal + boost * horizontalToHorizontalBoost.getValue(speedHorizontal);
         };

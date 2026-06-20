@@ -23,23 +23,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Player.class)
 public class PlayerMixin implements DoubleJumper {
 
-    @Unique
-    private boolean flappyWings$hasDoubleJumped = false;
-
-    @Unique
-    private boolean flappyWings$doubleJumpReady = true;
-
-    @Unique
-    private int flappyWings$lastDoubleJumpTick = 0;
-
-    @Unique
-    private Vec3 flappyWings$movementBeforeLaunching = new Vec3(0, 0, 0);
-
-    @Unique
-    private double flappyWings$minHeightAfterLaunching = 0;
-
-    @Unique
-    private double flappyWings$topHeightAfterLaunching = 0;
+    @Unique private boolean flappyWings$hasDoubleJumped = false;
+    @Unique private boolean flappyWings$doubleJumpReady = true;
+    @Unique private int flappyWings$doubleJumpsRemaining = Config.doubleJumpCount;
+    @Unique private int flappyWings$lastDoubleJumpTick = 0;
+    @Unique private Vec3 flappyWings$movementBeforeLaunching = new Vec3(0, 0, 0);
+    @Unique private double flappyWings$minHeightAfterLaunching = 0;
+    @Unique private double flappyWings$topHeightAfterLaunching = 0;
 
     @Unique
     private boolean flappyWings$mayFlyHere(Player player) {
@@ -56,12 +46,16 @@ public class PlayerMixin implements DoubleJumper {
         if (flappyWings$mayFlyHere(player)) return;
 
         if (!player.onGround() && !player.isFallFlying() && !player.isInWater() && !player.isInLava()
-                && !player.hasEffect(MobEffects.LEVITATION) && !player.onClimbable() && this.flappyWings$doubleJumpReady) {
+                && !player.hasEffect(MobEffects.LEVITATION) && !player.onClimbable()
+                && this.flappyWings$doubleJumpReady
+                && this.flappyWings$doubleJumpsRemaining > 0) {
 
             ItemStack itemstack = player.getItemBySlot(EquipmentSlot.CHEST);
 
             if (itemstack.canElytraFly(player)) {
                 flappyWings$startDoubleJumping(player);
+
+                this.flappyWings$doubleJumpsRemaining--;
 
                 if (player.level().isClientSide()) {
                     // Send a packet immediately so server and client animation tick targets align
@@ -82,6 +76,7 @@ public class PlayerMixin implements DoubleJumper {
         if (player.isInWater() || player.isInLava() || player.onClimbable() || player.isSpectator()) {
             this.flappyWings$hasDoubleJumped = false;
             this.flappyWings$doubleJumpReady = true;
+            this.flappyWings$doubleJumpsRemaining = Config.doubleJumpCount;
         }
 
         int ticksSinceJump = player.tickCount - this.flappyWings$lastDoubleJumpTick;
@@ -107,8 +102,10 @@ public class PlayerMixin implements DoubleJumper {
         Player player = (Player) (Object) this;
 
         if (!this.flappyWings$hasDoubleJumped) return fallDistance;
+
         this.flappyWings$hasDoubleJumped = false; // Reset because we hit the ground
         this.flappyWings$doubleJumpReady = true;
+        this.flappyWings$doubleJumpsRemaining = Config.doubleJumpCount;
 
         double safeFallHeight = this.flappyWings$minHeightAfterLaunching - player.getAttributeValue(Attributes.SAFE_FALL_DISTANCE);
         boolean landingAboveJump = player.getY() > safeFallHeight;
