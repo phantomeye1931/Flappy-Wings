@@ -8,6 +8,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
@@ -32,14 +34,20 @@ public record ServerboundDoubleJumpPayload() implements CustomPacketPayload {
 
                 jumper.flappyWings$startDoubleJumping(serverPlayer);
 
-                serverPlayer.connection.resetPosition();
-                ((FlightResetAccessor) serverPlayer.connection).flappyWings$resetFlightAntiCheat();
+                ItemStack chestItem = serverPlayer.getItemBySlot(EquipmentSlot.CHEST);
+                if (chestItem.canElytraFly(serverPlayer) && chestItem.isDamageableItem()) {
+                    chestItem.hurtAndBreak(2, serverPlayer, EquipmentSlot.CHEST);
+                }
 
                 // Tell all surrounding players to run the animation locally
                 PacketDistributor.sendToPlayersTrackingEntity(
                         serverPlayer,
                         new ClientboundDoubleJumpPayload(serverPlayer.getId())
                 );
+
+                // Prevent "Flying is not enabled on this server"
+                serverPlayer.connection.resetPosition();
+                ((FlightResetAccessor) serverPlayer.connection).flappyWings$resetFlightAntiCheat();
             }
         });
     }
