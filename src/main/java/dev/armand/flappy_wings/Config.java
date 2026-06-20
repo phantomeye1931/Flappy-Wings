@@ -39,7 +39,7 @@ public class Config {
             .defineListAllowEmpty("flying_dimensions", List.of("minecraft:the_end"), () -> "", Config::validateItemName);
 
     private static boolean validateItemName(final Object obj) {
-        return obj instanceof String itemName; // && BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(itemName));
+        return obj instanceof String;
     }
 
     static final ModConfigSpec SPEC = BUILDER.build();

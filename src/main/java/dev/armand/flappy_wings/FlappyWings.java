@@ -40,5 +40,3 @@ public class FlappyWings {
         );
     }
 }
-
-// TODO: Fix "flying is not enabled on this server"

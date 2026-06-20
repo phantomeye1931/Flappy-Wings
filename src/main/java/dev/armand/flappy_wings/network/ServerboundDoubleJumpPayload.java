@@ -30,9 +30,6 @@ public record ServerboundDoubleJumpPayload() implements CustomPacketPayload {
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 DoubleJumper jumper = (DoubleJumper) serverPlayer;
 
-//                jumper.flappyWings$setLastDoubleJumpTick(serverPlayer.tickCount);
-//                jumper.flappyWings$setHasDoubleJumped(true);
-
                 jumper.flappyWings$startDoubleJumping(serverPlayer);
 
                 serverPlayer.connection.resetPosition();
