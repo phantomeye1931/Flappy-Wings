@@ -2,7 +2,7 @@
   "item.elytra.flap": {
     "category": "players",
     "sounds": [
-      "monarch_wings:flap"
+      "flappy_wings:flap"
     ],
     "subtitle": "item.elytra.flap"
   }

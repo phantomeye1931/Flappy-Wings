@@ -1,4 +1,4 @@
-package dev.armand.monarch_wings;
+package dev.armand.flappy_wings;
 
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@EventBusSubscriber(modid = MonarchWings.MOD_ID)
+@EventBusSubscriber(modid = FlappyWings.MOD_ID)
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 

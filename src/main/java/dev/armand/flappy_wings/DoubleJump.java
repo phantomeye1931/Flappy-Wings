@@ -1,6 +1,6 @@
-package dev.armand.monarch_wings;
+package dev.armand.flappy_wings;
 
-import dev.armand.monarch_wings.util.SmoothGradient;
+import dev.armand.flappy_wings.util.SmoothGradient;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -53,7 +53,7 @@ public class DoubleJump {
                 Mth.lerp(amount, movement.z, horizontal.apply(movement.z))
         );
 
-        if (ticks == 0) player.playSound(MonarchWingsSounds.ELYTRA_FLAP.get());
+        if (ticks == 0) player.playSound(FlappyWingsSounds.ELYTRA_FLAP.get());
 
         if (ticks > 2) {
 

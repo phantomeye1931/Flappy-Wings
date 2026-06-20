@@ -1,8 +1,8 @@
-package dev.armand.monarch_wings.mixin;
+package dev.armand.flappy_wings.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
-import dev.armand.monarch_wings.DoubleJumper;
+import dev.armand.flappy_wings.DoubleJumper;
 import net.minecraft.client.model.ElytraModel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -43,12 +43,12 @@ public class ElytraModelMixin {
         DoubleJumper accessor = (DoubleJumper) player;
 
         // Check if they already burned their double jump token
-        if (accessor.monarchWings$hasDoubleJumped()) {
+        if (accessor.flappyWings$hasDoubleJumped()) {
             float x_orig = x_rot.get();
             float z_orig = z_rot.get();
             float y_orig = y_rot.get();
 
-            int ticksPassed = accessor.monarchWings$getTicksSinceDoubleJump();
+            int ticksPassed = accessor.flappyWings$getTicksSinceDoubleJump();
 
             // 15 -15 0
             // 60 -60 20
