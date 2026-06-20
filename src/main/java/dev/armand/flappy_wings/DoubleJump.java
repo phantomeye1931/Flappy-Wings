@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public class DoubleJump {
@@ -22,18 +23,20 @@ public class DoubleJump {
         verticalToHorizontalBoost = new SmoothGradient();
         horizontalToHorizontalBoost = new SmoothGradient();
 
-        verticalToVerticalBoost.addStop(0.3, 0.6);
-        verticalToVerticalBoost.addStop(0.1, 1);
-        verticalToVerticalBoost.addStop(-0.7, 1);
-        verticalToVerticalBoost.addStop(-1.6, 0.6);
+        Supplier<Boolean> ifDynamicBoostsEnabled = () -> Config.enableDynamicBoosts;
 
-        verticalToHorizontalBoost.addStop(0.5, 0.8);
+        verticalToVerticalBoost.addStop(0.3, 0.6, ifDynamicBoostsEnabled);
+        verticalToVerticalBoost.addStop(0.1, 1);
+        verticalToVerticalBoost.addStop(-0.7, 1, ifDynamicBoostsEnabled);
+        verticalToVerticalBoost.addStop(-1.6, 0.6, ifDynamicBoostsEnabled);
+
+        verticalToHorizontalBoost.addStop(0.5, 0.8, ifDynamicBoostsEnabled);
         verticalToHorizontalBoost.addStop(0, 0.3);
-        verticalToHorizontalBoost.addStop(-0.7, 0.3);
-        verticalToHorizontalBoost.addStop(-1.6, 0.8);
+        verticalToHorizontalBoost.addStop(-0.7, 0.3, ifDynamicBoostsEnabled);
+        verticalToHorizontalBoost.addStop(-1.6, 0.8, ifDynamicBoostsEnabled);
 
         horizontalToHorizontalBoost.addStop(-0.05, 1);
-        horizontalToHorizontalBoost.addStop(0, 0.1);
+        horizontalToHorizontalBoost.addStop(0, 0.04);
         horizontalToHorizontalBoost.addStop(0.05, 1);
     }
 
