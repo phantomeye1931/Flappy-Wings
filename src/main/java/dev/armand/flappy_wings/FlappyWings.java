@@ -22,6 +22,7 @@ public class FlappyWings {
         LOGGER.info("Flappy Wings initialized. Vanilla elytra flight disabled.");
 
         FlappyWingsSounds.register(modEventBus);
+        FlappyWingsParticles.register(modEventBus);
         modEventBus.addListener(this::registerPackets);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -33,7 +34,6 @@ public class FlappyWings {
     private void registerPackets(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar(MOD_ID);
 
-        // Register the payload, its codec, and the server-side handler execution path
         registrar.playToServer(
                 ServerboundDoubleJumpPayload.TYPE,
                 ServerboundDoubleJumpPayload.CODEC,

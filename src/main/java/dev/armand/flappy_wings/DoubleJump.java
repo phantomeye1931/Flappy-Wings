@@ -1,7 +1,6 @@
 package dev.armand.flappy_wings;
 
 import dev.armand.flappy_wings.util.SmoothGradient;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -25,6 +24,8 @@ public class DoubleJump {
         verticalRatioGradient.addStop(-0.7, 1);
         verticalRatioGradient.addStop(-1.6, 0.6);
 
+//        horizontalRatioGradient.addStop(0.2, 1.25);
+//        horizontalRatioGradient.addStop(0, 1);
         horizontalRatioGradient.addStop(-0.7, 1);
         horizontalRatioGradient.addStop(-1.6, 1.3);
     }
@@ -41,7 +42,7 @@ public class DoubleJump {
         System.out.println("ORIGINAL Y: " + verticalSpeed);
 
         UnaryOperator<Double> horizontal = (speedHorizontal) -> {
-            double speedMultiplier = Math.sqrt( 1 / horizontalRatioGradient.getValue(verticalSpeed) );
+            double speedMultiplier = horizontalRatioGradient.getValue(verticalSpeed);
             System.out.println(speedMultiplier);
             return speedHorizontal * speedMultiplier * Config.horizontalMultiplier;
         };
@@ -69,7 +70,7 @@ public class DoubleJump {
                 double dy = player.getRandom().nextDouble() * 0.2;
 
                 player.level().addParticle(
-                        player.getRandom().nextDouble() > 0.5 ? ParticleTypes.GUST : ParticleTypes.SMALL_GUST,
+                        FlappyWingsParticles.ELYTRA_WIND.get(),
                         player.getX() + dx, player.getY() + dy, player.getZ() + dz,
                         dx * 0.5, -0.4 - player.getRandom().nextDouble() * 0.3, dz * 0.5
                 );
@@ -80,19 +81,19 @@ public class DoubleJump {
     public static void landingParticles(Player player) {
         if (player.level() instanceof ServerLevel serverLevel) {
 
-            int particleCount = 4 + player.getRandom().nextInt(5);
+            int particleCount = 8 + player.getRandom().nextInt(5);
 
             for (int i = 0; i < particleCount; i++) {
                 double angle = (i * Math.PI * 2) / particleCount;
 
                 // Form a small circle around the player's feet
-                double dx = Math.cos(angle) * 0.3 + player.getRandom().nextDouble() * 0.2 - 0.1;
-                double dz = Math.sin(angle) * 0.3 + player.getRandom().nextDouble() * 0.2 - 0.1;
+                double dx = Math.cos(angle) * 0.6 + player.getRandom().nextDouble() * 0.4 - 0.2; // This returns [0, 5) which gets rounded down to [0, 4]
+                double dz = Math.sin(angle) * 0.6 + player.getRandom().nextDouble() * 0.4 - 0.2;
 
                 serverLevel.sendParticles(
-                        ParticleTypes.CLOUD,
+                        FlappyWingsParticles.ELYTRA_POOF.get(),
                         player.getX() + dx, player.getY() + 0.1, player.getZ() + dz, // Position
-                        0, dx * 0.2, 0.5, dz * 0.2, 1.0
+                        0, dx * 0.2, 0.5, dz * 0.2, 0
                 );
             }
         }
