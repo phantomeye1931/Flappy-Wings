@@ -9,6 +9,9 @@
   "client": [
     "ElytraModelMixin"
   ],
+  "server": [
+    "ServerGamePacketListenerImplMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },
