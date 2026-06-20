@@ -6,28 +6,35 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 
 public class DoubleJump {
 
     public static final int LAUNCH_DELAY_TICKS = 7;
 
-    public static final SmoothGradient verticalRatioGradient;
-    public static final SmoothGradient horizontalRatioGradient;
+    public static final SmoothGradient verticalToVerticalBoost;
+    public static final SmoothGradient verticalToHorizontalBoost;
+    public static final SmoothGradient horizontalToHorizontalBoost;
 
     static {
-        verticalRatioGradient = new SmoothGradient();
-        horizontalRatioGradient = new SmoothGradient();
+        verticalToVerticalBoost = new SmoothGradient();
+        verticalToHorizontalBoost = new SmoothGradient();
+        horizontalToHorizontalBoost = new SmoothGradient();
 
-        verticalRatioGradient.addStop(0.3, 0.6);
-        verticalRatioGradient.addStop(0.1, 1);
-        verticalRatioGradient.addStop(-0.7, 1);
-        verticalRatioGradient.addStop(-1.6, 0.6);
+        verticalToVerticalBoost.addStop(0.3, 0.6);
+        verticalToVerticalBoost.addStop(0.1, 1);
+        verticalToVerticalBoost.addStop(-0.7, 1);
+        verticalToVerticalBoost.addStop(-1.6, 0.6);
 
-//        horizontalRatioGradient.addStop(0.2, 1.25);
-//        horizontalRatioGradient.addStop(0, 1);
-        horizontalRatioGradient.addStop(-0.7, 1);
-        horizontalRatioGradient.addStop(-1.6, 1.3);
+        verticalToHorizontalBoost.addStop(0.5, 0.5);
+        verticalToHorizontalBoost.addStop(0, 0.3);
+        verticalToHorizontalBoost.addStop(-0.7, 0.3);
+        verticalToHorizontalBoost.addStop(-1.6, 0.8);
+
+        horizontalToHorizontalBoost.addStop(-0.1, 1);
+        horizontalToHorizontalBoost.addStop(0, 0.4);
+        horizontalToHorizontalBoost.addStop(0.1, 1);
     }
 
     public static void launchPlayer(Player player, Vec3 originalMovement, int ticks) {
@@ -41,17 +48,21 @@ public class DoubleJump {
         double verticalSpeed = originalMovement.y;
         System.out.println("ORIGINAL Y: " + verticalSpeed);
 
-        UnaryOperator<Double> horizontal = (speedHorizontal) -> {
-            double speedMultiplier = horizontalRatioGradient.getValue(verticalSpeed);
-            System.out.println(speedMultiplier);
-            return speedHorizontal * speedMultiplier * Config.horizontalMultiplier;
+        BiFunction<Double, Boolean, Double> horizontal = (speedHorizontal, isX) -> {
+            float yaw = player.getYRot();
+            double dx = -Math.sin(Math.toRadians(yaw));
+            double dz = Math.cos(Math.toRadians(yaw));
+
+            double boost = (isX ? dx : dz) * Config.horizontalMultiplier * verticalToHorizontalBoost.getValue(verticalSpeed);
+
+            return speedHorizontal * 0 + boost * horizontalToHorizontalBoost.getValue(speedHorizontal);
         };
-        UnaryOperator<Double> vertical = (speedVertical) -> verticalRatioGradient.getValue(verticalSpeed) * Config.verticalBoost;
+        UnaryOperator<Double> vertical = (speedVertical) -> verticalToVerticalBoost.getValue(verticalSpeed) * Config.verticalBoost;
 
         player.setDeltaMovement(
-                Mth.lerp(amount, movement.x, horizontal.apply(movement.x)),
+                Mth.lerp(amount, movement.x, horizontal.apply(movement.x, true)),
                 Mth.lerp(amount, movement.y, vertical.apply(movement.y)),
-                Mth.lerp(amount, movement.z, horizontal.apply(movement.z))
+                Mth.lerp(amount, movement.z, horizontal.apply(movement.z, false))
         );
 
         if (ticks == 0) player.playSound(
