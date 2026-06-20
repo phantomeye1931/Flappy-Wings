@@ -1,5 +1,6 @@
 package dev.armand.flappy_wings.network;
 
+import dev.armand.flappy_wings.Config;
 import dev.armand.flappy_wings.DoubleJumper;
 import dev.armand.flappy_wings.FlappyWings;
 import net.minecraft.client.Minecraft;
@@ -7,7 +8,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,11 +34,13 @@ public record ClientboundDoubleJumpPayload(int playerId) implements CustomPacket
         context.enqueueWork(() -> {
             // Client-side tracking update
             if (Minecraft.getInstance().level != null &&
-                    Minecraft.getInstance().level.getEntity(payload.playerId()) instanceof Player targetPlayer) {
+                    Minecraft.getInstance().level.getEntity(payload.playerId()) instanceof Player player) {
 
-                DoubleJumper jumper = (DoubleJumper) targetPlayer;
-                jumper.flappyWings$setHasDoubleJumped(true);
-                jumper.flappyWings$setLastDoubleJumpTick(targetPlayer.tickCount);
+                DoubleJumper jumper = (DoubleJumper) player;
+                jumper.flappyWings$startDoubleJumping(player);
+
+                ItemStack chestItem = player.getItemBySlot(EquipmentSlot.CHEST);
+                player.getCooldowns().addCooldown(chestItem.getItem(), Config.cooldownTicks);
             }
         });
     }
