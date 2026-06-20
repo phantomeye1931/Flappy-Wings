@@ -27,14 +27,14 @@ public class DoubleJump {
         verticalToVerticalBoost.addStop(-0.7, 1);
         verticalToVerticalBoost.addStop(-1.6, 0.6);
 
-        verticalToHorizontalBoost.addStop(0.5, 0.5);
+        verticalToHorizontalBoost.addStop(0.5, 0.8);
         verticalToHorizontalBoost.addStop(0, 0.3);
         verticalToHorizontalBoost.addStop(-0.7, 0.3);
         verticalToHorizontalBoost.addStop(-1.6, 0.8);
 
-        horizontalToHorizontalBoost.addStop(-0.1, 1);
-        horizontalToHorizontalBoost.addStop(0, 0.4);
-        horizontalToHorizontalBoost.addStop(0.1, 1);
+        horizontalToHorizontalBoost.addStop(-0.05, 1);
+        horizontalToHorizontalBoost.addStop(0, 0.1);
+        horizontalToHorizontalBoost.addStop(0.05, 1);
     }
 
     public static void launchPlayer(Player player, Vec3 originalMovement, int ticks) {
@@ -46,7 +46,6 @@ public class DoubleJump {
         Vec3 movement = player.getDeltaMovement();
 
         double verticalSpeed = originalMovement.y;
-        System.out.println("ORIGINAL Y: " + verticalSpeed);
 
         BiFunction<Double, Boolean, Double> horizontal = (speedHorizontal, isX) -> {
             float yaw = player.getYRot();
@@ -55,7 +54,7 @@ public class DoubleJump {
 
             double boost = (isX ? dx : dz) * Config.horizontalMultiplier * verticalToHorizontalBoost.getValue(verticalSpeed);
 
-            return speedHorizontal * 0 + boost * horizontalToHorizontalBoost.getValue(speedHorizontal);
+            return speedHorizontal + boost * horizontalToHorizontalBoost.getValue(speedHorizontal);
         };
         UnaryOperator<Double> vertical = (speedVertical) -> verticalToVerticalBoost.getValue(verticalSpeed) * Config.verticalBoost;
 
