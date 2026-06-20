@@ -1,8 +1,8 @@
-package dev.armand.monarch_wings;
+package dev.armand.flappy_wings;
 
 import com.mojang.logging.LogUtils;
-import dev.armand.monarch_wings.network.ClientboundDoubleJumpPayload;
-import dev.armand.monarch_wings.network.ServerboundDoubleJumpPayload;
+import dev.armand.flappy_wings.network.ClientboundDoubleJumpPayload;
+import dev.armand.flappy_wings.network.ServerboundDoubleJumpPayload;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -13,15 +13,15 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
 
-@Mod(MonarchWings.MOD_ID)
-public class MonarchWings {
-    public static final String MOD_ID = "monarch_wings";
+@Mod(FlappyWings.MOD_ID)
+public class FlappyWings {
+    public static final String MOD_ID = "flappy_wings";
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public MonarchWings(IEventBus modEventBus, ModContainer modContainer) {
-        LOGGER.info("Monarch Wings initialized. Vanilla elytra flight disabled.");
+    public FlappyWings(IEventBus modEventBus, ModContainer modContainer) {
+        LOGGER.info("Flappy Wings initialized. Vanilla elytra flight disabled.");
 
-        MonarchWingsSounds.register(modEventBus);
+        FlappyWingsSounds.register(modEventBus);
         modEventBus.addListener(this::registerPackets);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);

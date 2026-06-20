@@ -1,7 +1,7 @@
-package dev.armand.monarch_wings.network;
+package dev.armand.flappy_wings.network;
 
-import dev.armand.monarch_wings.DoubleJumper;
-import dev.armand.monarch_wings.MonarchWings;
+import dev.armand.flappy_wings.DoubleJumper;
+import dev.armand.flappy_wings.FlappyWings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public record ClientboundDoubleJumpPayload(int playerId) implements CustomPacketPayload {
     public static final Type<ClientboundDoubleJumpPayload> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(MonarchWings.MOD_ID, "double_jump_anim"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(FlappyWings.MOD_ID, "double_jump_anim"));
 
     public static final StreamCodec<FriendlyByteBuf, ClientboundDoubleJumpPayload> CODEC =
             StreamCodec.composite(
@@ -34,8 +34,8 @@ public record ClientboundDoubleJumpPayload(int playerId) implements CustomPacket
                     Minecraft.getInstance().level.getEntity(payload.playerId()) instanceof Player targetPlayer) {
 
                 DoubleJumper jumper = (DoubleJumper) targetPlayer;
-                jumper.monarchWings$setHasDoubleJumped(true);
-                jumper.monarchWings$setLastDoubleJumpTick(targetPlayer.tickCount);
+                jumper.flappyWings$setHasDoubleJumped(true);
+                jumper.flappyWings$setLastDoubleJumpTick(targetPlayer.tickCount);
             }
         });
     }

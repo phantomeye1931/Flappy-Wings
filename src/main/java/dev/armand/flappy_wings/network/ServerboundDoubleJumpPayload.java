@@ -1,7 +1,7 @@
-package dev.armand.monarch_wings.network;
+package dev.armand.flappy_wings.network;
 
-import dev.armand.monarch_wings.DoubleJumper;
-import dev.armand.monarch_wings.MonarchWings;
+import dev.armand.flappy_wings.DoubleJumper;
+import dev.armand.flappy_wings.FlappyWings;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public record ServerboundDoubleJumpPayload() implements CustomPacketPayload {
     public static final Type<ServerboundDoubleJumpPayload> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(MonarchWings.MOD_ID, "double_jump"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(FlappyWings.MOD_ID, "double_jump"));
 
     public static final StreamCodec<FriendlyByteBuf, ServerboundDoubleJumpPayload> CODEC =
             StreamCodec.unit(new ServerboundDoubleJumpPayload());
@@ -29,10 +29,10 @@ public record ServerboundDoubleJumpPayload() implements CustomPacketPayload {
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 DoubleJumper jumper = (DoubleJumper) serverPlayer;
 
-//                jumper.monarchWings$setLastDoubleJumpTick(serverPlayer.tickCount);
-//                jumper.monarchWings$setHasDoubleJumped(true);
+//                jumper.flappyWings$setLastDoubleJumpTick(serverPlayer.tickCount);
+//                jumper.flappyWings$setHasDoubleJumped(true);
 
-                jumper.monarchWings$startDoubleJumping(serverPlayer);
+                jumper.flappyWings$startDoubleJumping(serverPlayer);
 
                 // Tell all surrounding players to run the animation locally
                 PacketDistributor.sendToPlayersTrackingEntity(

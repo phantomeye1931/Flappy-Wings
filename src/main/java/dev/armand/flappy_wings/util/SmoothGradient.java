@@ -1,4 +1,4 @@
-package dev.armand.monarch_wings.util;
+package dev.armand.flappy_wings.util;
 
 import java.util.Map;
 import java.util.TreeMap;

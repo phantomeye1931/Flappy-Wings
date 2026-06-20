@@ -1,9 +1,9 @@
-package dev.armand.monarch_wings.mixin;
+package dev.armand.flappy_wings.mixin;
 
-import dev.armand.monarch_wings.Config;
-import dev.armand.monarch_wings.DoubleJump;
-import dev.armand.monarch_wings.DoubleJumper;
-import dev.armand.monarch_wings.network.ServerboundDoubleJumpPayload;
+import dev.armand.flappy_wings.Config;
+import dev.armand.flappy_wings.DoubleJump;
+import dev.armand.flappy_wings.DoubleJumper;
+import dev.armand.flappy_wings.network.ServerboundDoubleJumpPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -24,25 +24,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class PlayerMixin implements DoubleJumper {
 
     @Unique
-    private boolean monarchWings$hasDoubleJumped = false;
+    private boolean flappyWings$hasDoubleJumped = false;
 
     @Unique
-    private boolean monarchWings$doubleJumpReady = true;
+    private boolean flappyWings$doubleJumpReady = true;
 
     @Unique
-    private int monarchWings$lastDoubleJumpTick = 0;
+    private int flappyWings$lastDoubleJumpTick = 0;
 
     @Unique
-    private Vec3 monarchWings$movementBeforeLaunching = new Vec3(0, 0, 0);
+    private Vec3 flappyWings$movementBeforeLaunching = new Vec3(0, 0, 0);
 
     @Unique
-    private double monarchWings$minHeightAfterLaunching = 0;
+    private double flappyWings$minHeightAfterLaunching = 0;
 
     @Unique
-    private double monarchWings$topHeightAfterLaunching = 0;
+    private double flappyWings$topHeightAfterLaunching = 0;
 
     @Unique
-    private boolean monarchWings$mayFlyHere(Player player) {
+    private boolean flappyWings$mayFlyHere(Player player) {
         ResourceLocation dimension = player.level().dimension().location();
         return Config.flyingDimensions.contains(dimension.toString())
                 || Config.flyingDimensions.contains(dimension.getPath());
@@ -53,15 +53,15 @@ public class PlayerMixin implements DoubleJumper {
         Player player = (Player) (Object) this;
 
         // If we're in a dimension where flying is enabled, SKIP
-        if (monarchWings$mayFlyHere(player)) return;
+        if (flappyWings$mayFlyHere(player)) return;
 
         if (!player.onGround() && !player.isFallFlying() && !player.isInWater() && !player.isInLava()
-                && !player.hasEffect(MobEffects.LEVITATION) && !player.onClimbable() && this.monarchWings$doubleJumpReady) {
+                && !player.hasEffect(MobEffects.LEVITATION) && !player.onClimbable() && this.flappyWings$doubleJumpReady) {
 
             ItemStack itemstack = player.getItemBySlot(EquipmentSlot.CHEST);
 
             if (itemstack.canElytraFly(player)) {
-                monarchWings$startDoubleJumping(player);
+                flappyWings$startDoubleJumping(player);
 
                 if (player.level().isClientSide()) {
                     // Send a packet immediately so server and client animation tick targets align
@@ -77,26 +77,26 @@ public class PlayerMixin implements DoubleJumper {
     private void handleDelayedJumpLaunch(CallbackInfo ci) {
         Player player = (Player) (Object) this;
 
-        if (!this.monarchWings$hasDoubleJumped) return;
+        if (!this.flappyWings$hasDoubleJumped) return;
 
         if (player.isInWater() || player.isInLava() || player.onClimbable() || player.isSpectator()) {
-            this.monarchWings$hasDoubleJumped = false;
-            this.monarchWings$doubleJumpReady = true;
+            this.flappyWings$hasDoubleJumped = false;
+            this.flappyWings$doubleJumpReady = true;
         }
 
-        int ticksSinceJump = player.tickCount - this.monarchWings$lastDoubleJumpTick;
+        int ticksSinceJump = player.tickCount - this.flappyWings$lastDoubleJumpTick;
 
         // Reset the double jump after the config-specified cooldown
         if (ticksSinceJump > Config.cooldownTicks) {
-            this.monarchWings$doubleJumpReady = true;
+            this.flappyWings$doubleJumpReady = true;
         }
 
-        this.monarchWings$topHeightAfterLaunching = Math.max(this.monarchWings$topHeightAfterLaunching, player.position().y());
+        this.flappyWings$topHeightAfterLaunching = Math.max(this.flappyWings$topHeightAfterLaunching, player.position().y());
 
-        if (this.monarchWings$hasDoubleJumped && ticksSinceJump < DoubleJump.LAUNCH_DELAY_TICKS) {
-            this.monarchWings$minHeightAfterLaunching = Math.min(this.monarchWings$minHeightAfterLaunching, player.position().y());
+        if (this.flappyWings$hasDoubleJumped && ticksSinceJump < DoubleJump.LAUNCH_DELAY_TICKS) {
+            this.flappyWings$minHeightAfterLaunching = Math.min(this.flappyWings$minHeightAfterLaunching, player.position().y());
 
-            DoubleJump.launchPlayer(player, this.monarchWings$movementBeforeLaunching, ticksSinceJump);
+            DoubleJump.launchPlayer(player, this.flappyWings$movementBeforeLaunching, ticksSinceJump);
         }
 
     }
@@ -106,11 +106,11 @@ public class PlayerMixin implements DoubleJumper {
     private float decreaseDoubleJumpFallDamage(float fallDistance) {
         Player player = (Player) (Object) this;
 
-        if (!this.monarchWings$hasDoubleJumped) return fallDistance;
-        this.monarchWings$hasDoubleJumped = false; // Reset because we hit the ground
-        this.monarchWings$doubleJumpReady = true;
+        if (!this.flappyWings$hasDoubleJumped) return fallDistance;
+        this.flappyWings$hasDoubleJumped = false; // Reset because we hit the ground
+        this.flappyWings$doubleJumpReady = true;
 
-        double safeFallHeight = this.monarchWings$minHeightAfterLaunching - player.getAttributeValue(Attributes.SAFE_FALL_DISTANCE);
+        double safeFallHeight = this.flappyWings$minHeightAfterLaunching - player.getAttributeValue(Attributes.SAFE_FALL_DISTANCE);
         boolean landingAboveJump = player.getY() > safeFallHeight;
 
         if (landingAboveJump && fallDistance > player.getAttributeValue(Attributes.SAFE_FALL_DISTANCE)) {
@@ -119,41 +119,41 @@ public class PlayerMixin implements DoubleJumper {
             return 0f;
         }
 
-        double jumpHeight = this.monarchWings$topHeightAfterLaunching - this.monarchWings$minHeightAfterLaunching;
+        double jumpHeight = this.flappyWings$topHeightAfterLaunching - this.flappyWings$minHeightAfterLaunching;
 
         return Math.max(0f, (float) (fallDistance - jumpHeight));
     }
 
     @Override
-    public void monarchWings$startDoubleJumping(Player player) {
-        this.monarchWings$hasDoubleJumped = true;
-        this.monarchWings$doubleJumpReady = false;
-        this.monarchWings$lastDoubleJumpTick = player.tickCount;
-        this.monarchWings$movementBeforeLaunching = player.getDeltaMovement();
+    public void flappyWings$startDoubleJumping(Player player) {
+        this.flappyWings$hasDoubleJumped = true;
+        this.flappyWings$doubleJumpReady = false;
+        this.flappyWings$lastDoubleJumpTick = player.tickCount;
+        this.flappyWings$movementBeforeLaunching = player.getDeltaMovement();
 
-        this.monarchWings$topHeightAfterLaunching = player.position().y();
-        this.monarchWings$minHeightAfterLaunching = player.position().y();
+        this.flappyWings$topHeightAfterLaunching = player.position().y();
+        this.flappyWings$minHeightAfterLaunching = player.position().y();
     }
 
     @Override
-    public void monarchWings$setLastDoubleJumpTick(int tick) {
-        this.monarchWings$lastDoubleJumpTick = tick;
+    public void flappyWings$setLastDoubleJumpTick(int tick) {
+        this.flappyWings$lastDoubleJumpTick = tick;
     }
 
     @Override
-    public boolean monarchWings$hasDoubleJumped() {
-        return this.monarchWings$hasDoubleJumped;
+    public boolean flappyWings$hasDoubleJumped() {
+        return this.flappyWings$hasDoubleJumped;
     }
 
     @Override
-    public void monarchWings$setHasDoubleJumped(boolean hasDoubleJumped) {
-        this.monarchWings$hasDoubleJumped = hasDoubleJumped;
+    public void flappyWings$setHasDoubleJumped(boolean hasDoubleJumped) {
+        this.flappyWings$hasDoubleJumped = hasDoubleJumped;
     }
 
     @Override
-    public int monarchWings$getTicksSinceDoubleJump() {
+    public int flappyWings$getTicksSinceDoubleJump() {
         Player player = (Player) (Object) this;
 
-        return player.tickCount - this.monarchWings$lastDoubleJumpTick;
+        return player.tickCount - this.flappyWings$lastDoubleJumpTick;
     }
 }
