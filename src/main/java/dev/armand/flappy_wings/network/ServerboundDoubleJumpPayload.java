@@ -1,5 +1,6 @@
 package dev.armand.flappy_wings.network;
 
+import dev.armand.flappy_wings.Config;
 import dev.armand.flappy_wings.DoubleJumper;
 import dev.armand.flappy_wings.FlappyWings;
 import dev.armand.flappy_wings.util.FlightResetAccessor;
@@ -38,6 +39,8 @@ public record ServerboundDoubleJumpPayload() implements CustomPacketPayload {
                 if (chestItem.canElytraFly(serverPlayer) && chestItem.isDamageableItem()) {
                     chestItem.hurtAndBreak(2, serverPlayer, EquipmentSlot.CHEST);
                 }
+
+                serverPlayer.getCooldowns().addCooldown(chestItem.getItem(), Config.cooldownTicks);
 
                 // Tell all surrounding players to run the animation locally
                 PacketDistributor.sendToPlayersTrackingEntity(
