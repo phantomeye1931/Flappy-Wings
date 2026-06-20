@@ -1,4 +1,9 @@
 {
   "flappy_wings.configuration.cooldown_seconds": "Cooldown seconds",
-  "flappy_wings.configuration.flying_dimensions": "Flying dimensions"
+  "flappy_wings.configuration.vertical_boost": "Vertical boost",
+  "flappy_wings.configuration.horizontal_multiplier": "Horizontal Boost",
+  "flappy_wings.configuration.enable_dynamic_boosts": "Dynamic boosts",
+  "flappy_wings.configuration.flying_dimensions": "Flying dimensions",
+
+  "item.elytra.flap": "Elytra flaps"
 }
