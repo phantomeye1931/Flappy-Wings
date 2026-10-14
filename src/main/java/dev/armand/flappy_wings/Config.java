@@ -36,7 +36,7 @@ public class Config {
     // a list of strings that are treated as resource locations for items
     private static final ModConfigSpec.ConfigValue<List<? extends String>> FLYING_DIMENSIONS = BUILDER
             .comment("List of dimensions to disable Double Jump behaviour in, to have default flying")
-            .defineListAllowEmpty("flying_dimensions", List.of("minecraft:the_end"), () -> "", Config::validateItemName);
+            .defineListAllowEmpty("flying_dimensions", List.of(), () -> "", Config::validateItemName);
 
     private static boolean validateItemName(final Object obj) {
         return obj instanceof String;
