@@ -44,26 +44,47 @@ public class PlayerMixin implements DoubleJumper {
         // If we're in a dimension where flying is enabled, SKIP
         if (flappyWings$mayFlyHere(player)) return;
 
+        flappyWings$interceptElytraFlight(player);
+
+        cir.setReturnValue(false);
+    }
+
+    // Other mods (Caelus, ElytraSlot, Ad Astra's Jet Suit) call startFallFlying directly, skipping tryToStartFallFlying entirely
+    @Inject(method = "startFallFlying", at = @At("HEAD"), cancellable = true)
+    private void preventDirectElytraFlight(CallbackInfo ci) {
+        Player player = (Player) (Object) this;
+
+        if (flappyWings$mayFlyHere(player)) return;
+
+        ItemStack itemStack = player.getItemBySlot(EquipmentSlot.CHEST);
+
+        // Only intercept calls actually driven by an elytra-flyable chestpiece, leave unrelated flight alone
+        if (!itemStack.canElytraFly(player)) return;
+
+        flappyWings$interceptElytraFlight(player);
+
+        ci.cancel();
+    }
+
+    @Unique
+    private void flappyWings$interceptElytraFlight(Player player) {
         ItemStack itemStack = player.getItemBySlot(EquipmentSlot.CHEST);
 
         if (!player.onGround() && !player.isFallFlying() && !player.isInWater() && !player.isInLava()
                 && !player.hasEffect(MobEffects.LEVITATION) && !player.onClimbable()
                 && !player.getCooldowns().isOnCooldown(itemStack.getItem())
-                && this.flappyWings$doubleJumpsRemaining > 0) {
+                && this.flappyWings$doubleJumpsRemaining > 0
+                && itemStack.canElytraFly(player)) {
 
-            if (itemStack.canElytraFly(player)) {
-                flappyWings$startDoubleJumping(player);
+            flappyWings$startDoubleJumping(player);
 
-                this.flappyWings$doubleJumpsRemaining--;
+            this.flappyWings$doubleJumpsRemaining--;
 
-                if (player.level().isClientSide()) {
-                    // Send a packet immediately so server and client animation tick targets align
-                    PacketDistributor.sendToServer(new ServerboundDoubleJumpPayload());
-                }
+            if (player.level().isClientSide()) {
+                // Send a packet immediately so server and client animation tick targets align
+                PacketDistributor.sendToServer(new ServerboundDoubleJumpPayload());
             }
         }
-
-        cir.setReturnValue(false);
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
