@@ -53,6 +53,9 @@ public class Config {
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
+        // Unloading fires on server/world shutdown, by which point the config values can no longer be read
+        if (event instanceof ModConfigEvent.Unloading) return;
+
         double cooldownSeconds = COOLDOWN_SECONDS.get();
         if (cooldownSeconds == -1) {
             cooldownTicks = Integer.MAX_VALUE;
