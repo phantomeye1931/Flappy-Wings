@@ -50,7 +50,7 @@ The total config options to customise this mod with include:
 
 
 > ### ![Info symbol](https://cdn.modrinth.com/data/cached_images/9d817e28316429bbd45d2951e5d8d7fba618b4c9.png) Hot Tip
-> By default, using the Elytra to glide is still possible in **the End**, but this is **fully configurable per dimension**, including **modded dimensions**!
+> By default, double jumping **replaces gliding in every dimension**, but you can opt specific dimensions back into **vanilla gliding**, including **modded dimensions**!
 
 
 ![A player double jumping in the overworld, but gliding in the end](https://cdn.modrinth.com/data/cached_images/6da51dd6dfab79e12e2433b62aabf0a858c763d4_0.webp)
